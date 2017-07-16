@@ -35,6 +35,7 @@ type
     procedure btnExitClick(Sender: TObject);
   private
    fArray: array of array of TFrameSoduku;
+   procedure InitStores;
   public
     procedure AfterConstruction; override;
   end;
@@ -88,31 +89,47 @@ begin
   end;
 end;
 
+procedure TSodukuForm.InitStores;
+var
+  i, j: Integer;
+begin
+  for i := 0 to 2 do
+    for j := 0 to 2 do
+      fArray[i, j].InitStores;
+end;
+
 procedure TSodukuForm.btnExitClick(Sender: TObject);
 begin
   Close;
 end;
 
 procedure TSodukuForm.btnLoadClick(Sender: TObject);
+const
+ cnFile = 'Soduku.txt';
 var
   i, j, m, n, t: Integer;
   vList: TStringList;
 begin
   vList := TStringList.Create;
   try
-    if OpenDialog1.Execute then
-    begin
-      vList.LoadFromFile(OpenDialog1.FileName);
-      t := 0;
-      for i := 0 to 2 do
-        for j := 0 to 2 do
-          for m := 0 to 2 do
-            for n := 0 to 2 do
-            begin
-              fArray[i, j].SetString(m, n, vList[t]);
-              inc(t);
-            end;
-    end;
+    if FileExists(cnFile) then
+      vList.LoadFromFile(cnFile)
+    else if OpenDialog1.Execute then
+      vList.LoadFromFile(OpenDialog1.FileName)
+    else
+      Exit;
+
+    t := 0;
+    for i := 0 to 2 do
+      for j := 0 to 2 do
+        for m := 0 to 2 do
+          for n := 0 to 2 do
+          begin
+            fArray[i, j].SetString(m, n, vList[t]);
+            inc(t);
+          end;
+
+    InitStores;
   finally
     vList.Free;
   end;
